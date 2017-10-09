@@ -28,6 +28,8 @@ export default function DefaultStateController($scope, $timeout, $location, $sta
     vm.getStateObject = getStateObject;
     vm.navigatePrevState = navigatePrevState;
     vm.getStateId = getStateId;
+    vm.getStateIndex = getStateIndex;
+    vm.getStateIdAtIndex = getStateIdAtIndex;
     vm.getStateParams = getStateParams;
     vm.getStateParamsByStateId = getStateParamsByStateId;
     vm.getEntityId = getEntityId;
@@ -100,6 +102,22 @@ export default function DefaultStateController($scope, $timeout, $location, $sta
         }
     }
 
+    function getStateIndex() {
+        if (vm.stateObject && vm.stateObject.length) {
+            return vm.stateObject.length-1;
+        } else {
+            return -1;
+        }
+    }
+
+    function getStateIdAtIndex(index) {
+        if (vm.stateObject && vm.stateObject[index]) {
+            return vm.stateObject[index].id;
+        } else {
+            return '';
+        }
+    }
+
     function getStateParams() {
         if (vm.stateObject && vm.stateObject.length) {
             return vm.stateObject[vm.stateObject.length - 1].params;
@@ -154,8 +172,18 @@ export default function DefaultStateController($scope, $timeout, $location, $sta
             result = newResult;
         }
 
+        var rootStateId = dashboardUtils.getRootStateId(vm.states);
         if (!result[0].id) {
-            result[0].id = dashboardUtils.getRootStateId(vm.states);
+            result[0].id = rootStateId;
+        }
+        if (!vm.states[result[0].id]) {
+            result[0].id = rootStateId;
+        }
+        var i = result.length;
+        while (i--) {
+            if (!result[i].id || !vm.states[result[i].id]) {
+                result.splice(i, 1);
+            }
         }
         return result;
     }
